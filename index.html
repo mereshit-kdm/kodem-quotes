@@ -16,6 +16,7 @@
     }
 
     header {
+      position: relative;
       background: #111827;
       color: white;
       padding: 42px 18px;
@@ -181,14 +182,27 @@
   const quoteCount = document.getElementById("quoteCount");
   const quotesContainer = document.getElementById("quotesContainer");
 
+  function noCacheUrl(file) {
+    return file + "?v=" + Date.now();
+  }
+
   async function init() {
-    const response = await fetch(THEMES_FILE);
-    themes = await response.json();
-    renderThemes(themes);
+    try {
+      const response = await fetch(noCacheUrl(THEMES_FILE));
+      themes = await response.json();
+      renderThemes(themes);
+    } catch (error) {
+      themeList.innerHTML = `<div class="empty">Impossible de charger les thèmes.</div>`;
+    }
   }
 
   function renderThemes(list) {
     themeList.innerHTML = "";
+
+    if (list.length === 0) {
+      themeList.innerHTML = `<div class="empty">Aucun thème trouvé.</div>`;
+      return;
+    }
 
     list.forEach(theme => {
       const card = document.createElement("div");
@@ -196,8 +210,8 @@
       card.onclick = () => loadTheme(theme);
 
       card.innerHTML = `
-        <h2>${theme.name}</h2>
-        <p>${theme.description || "Voir les citations"}</p>
+        <h2>${escapeHtml(theme.name)}</h2>
+        <p>${escapeHtml(theme.description || "Voir les citations")}</p>
       `;
 
       themeList.appendChild(card);
@@ -208,23 +222,27 @@
     themeTitle.textContent = theme.name;
     quotesContainer.innerHTML = `<div class="empty">Chargement...</div>`;
 
-    const response = await fetch(theme.file);
-    const text = await response.text();
+    try {
+      const response = await fetch(noCacheUrl(theme.file));
+      const text = await response.text();
 
-    currentQuotes = text
-      .split("\n")
-      .map(line => line.trim())
-      .filter(line => line.length > 0)
-      .map(parseQuoteLine);
+      currentQuotes = text
+        .split("\n")
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .map(parseQuoteLine);
 
-    homePage.classList.add("hidden");
-    quotesPage.classList.remove("hidden");
+      homePage.classList.add("hidden");
+      quotesPage.classList.remove("hidden");
 
-    quoteSearch.value = "";
-    classifyBy.value = "all";
+      quoteSearch.value = "";
+      classifyBy.value = "all";
 
-    renderQuotes();
-    window.scrollTo(0, 0);
+      renderQuotes();
+      window.scrollTo(0, 0);
+    } catch (error) {
+      quotesContainer.innerHTML = `<div class="empty">Impossible de charger les citations.</div>`;
+    }
   }
 
   function parseQuoteLine(line) {
@@ -296,10 +314,10 @@
       card.className = "quote-card";
 
       card.innerHTML = `
-        <div class="quote-text">“${q.text}”</div>
+        <div class="quote-text">“${escapeHtml(q.text)}”</div>
         <div class="quote-meta">
-          ${q.author ? `<div><strong>Source / Auteur :</strong> ${q.author}</div>` : ""}
-          ${q.reference ? `<div><strong>Référence :</strong> ${q.reference}</div>` : ""}
+          ${q.author ? `<div><strong>Source / Auteur :</strong> ${escapeHtml(q.author)}</div>` : ""}
+          ${q.reference ? `<div><strong>Référence :</strong> ${escapeHtml(q.reference)}</div>` : ""}
         </div>
       `;
 
@@ -314,6 +332,15 @@
     homePage.classList.remove("hidden");
     quotesContainer.innerHTML = "";
     window.scrollTo(0, 0);
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
   themeSearch.addEventListener("input", () => {
