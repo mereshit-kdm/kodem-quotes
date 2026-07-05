@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Kodem Quotes</title>
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 28px 18px;
+      text-align: center;
+    }
+
+    main {
+      width: min(720px, 92%);
+      margin: 30px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 18px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 12px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button, a.button {
+      display: inline-block;
+      margin-top: 22px;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 12px;
+      background: #2563eb;
+      color: white;
+      font-size: 1rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    a.button.secondary {
+      background: #111827;
+      margin-right: 10px;
+    }
+
+    .message {
+      margin-top: 18px;
+      padding: 14px;
+      border-radius: 12px;
+      display: none;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .help {
+      color: #6b7280;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>⚙️ Admin Kodem Quotes</h1>
+  <p>Ajouter une citation dynamiquement</p>
+</header>
+
+<main>
+
+  <a class="button secondary" href="index.html">← Retour au site</a>
+
+  <form id="quoteForm">
+
+    <label for="password">Mot de passe admin</label>
+    <input type="password" id="password" required />
+
+    <label for="theme">Thème</label>
+    <input type="text" id="theme" placeholder="Exemple : Foi, Sagesse, Espérance" required />
+    <p class="help">
+      Si le thème existe déjà, la citation sera ajoutée au fichier correspondant.
+      Sinon, un nouveau fichier txt sera créé et themes.json sera mis à jour.
+    </p>
+
+    <label for="citation">Citation</label>
+    <textarea id="citation" placeholder="Écrire la citation ici..." required></textarea>
+
+    <label for="author">Source / Auteur</label>
+    <input type="text" id="author" placeholder="Exemple : Paul, Jésus, Socrate..." />
+
+    <label for="reference">Référence</label>
+    <input type="text" id="reference" placeholder="Exemple : 1 Corinthiens 13, Jean 15:12..." />
+
+    <button type="submit" id="submitBtn">Ajouter la citation</button>
+
+    <div id="message" class="message"></div>
+
+  </form>
+
+</main>
+
+<script>
+  const API_URL = "https://kodem-quotes.onrender.com/add-quote";
+
+  const form = document.getElementById("quoteForm");
+  const messageBox = document.getElementById("message");
+  const submitBtn = document.getElementById("submitBtn");
+
+  form.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Ajout en cours...";
+    hideMessage();
+
+    const data = {
+      password: document.getElementById("password").value.trim(),
+      theme: document.getElementById("theme").value.trim(),
+      citation: document.getElementById("citation").value.trim(),
+      author: document.getElementById("author").value.trim(),
+      reference: document.getElementById("reference").value.trim()
+    };
+
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Erreur inconnue");
+      }
+
+      showMessage("Citation ajoutée avec succès. GitHub Pages va se redéployer automatiquement.", "success");
+
+      document.getElementById("citation").value = "";
+      document.getElementById("author").value = "";
+      document.getElementById("reference").value = "";
+
+    } catch (error) {
+      showMessage(error.message, "error");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Ajouter la citation";
+    }
+  });
+
+  function showMessage(text, type) {
+    messageBox.textContent = text;
+    messageBox.className = "message " + type;
+    messageBox.style.display = "block";
+  }
+
+  function hideMessage() {
+    messageBox.style.display = "none";
+  }
+</script>
+
+</body>
+</html>
