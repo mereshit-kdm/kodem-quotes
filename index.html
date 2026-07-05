@@ -1,139 +1,99 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kodem Quotes</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kodem Quotes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      text-align: center;
+    }
 
-    <style>
-        *{
-            margin:0;
-            padding:0;
-            box-sizing:border-box;
-        }
+    header {
+      padding: 40px 20px;
+    }
 
-        body{
-            font-family:Arial, Helvetica, sans-serif;
-            background:#f4f4f4;
-            overflow:hidden;
-        }
+    h1 {
+      font-size: 3rem;
+    }
 
-        #home{
-            position:fixed;
-            inset:0;
-            display:flex;
-            flex-direction:column;
-            justify-content:center;
-            align-items:center;
-            background:#111827;
-            color:white;
-            z-index:10;
-        }
+    .quote-box {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 40px;
+      background: white;
+      color: #111827;
+      border-radius: 18px;
+      font-size: 1.8rem;
+      line-height: 1.5;
+    }
 
-        h1{
-            font-size:3rem;
-            margin-bottom:25px;
-        }
-
-        p{
-            font-size:1.1rem;
-            margin-bottom:40px;
-            color:#d1d5db;
-        }
-
-        button{
-            padding:18px 45px;
-            font-size:20px;
-            border:none;
-            border-radius:12px;
-            background:#2563eb;
-            color:white;
-            cursor:pointer;
-            transition:.25s;
-        }
-
-        button:hover{
-            background:#1d4ed8;
-            transform:scale(1.05);
-        }
-
-        #viewer{
-            position:fixed;
-            inset:0;
-            width:100%;
-            height:100%;
-            border:none;
-            display:none;
-        }
-
-        #back{
-            position:fixed;
-            top:15px;
-            left:15px;
-            z-index:999;
-            display:none;
-            padding:10px 20px;
-            border:none;
-            border-radius:8px;
-            background:#111827;
-            color:white;
-            cursor:pointer;
-        }
-    </style>
+    button {
+      padding: 16px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #2563eb;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
 
-<div id="home">
+<header>
+  <h1>Kodem Quotes</h1>
+  <p>Citations inspirantes</p>
+</header>
 
-    <h1>Site Kodem Quotes</h1>
+<main>
+  <div class="quote-box" id="quote">
+    Chargement des citations...
+  </div>
 
-    <p>Consulter les citations en lecture seule.</p>
-
-    <button onclick="openQuotes()">
-        📖 Lire les Quotes
-    </button>
-
-</div>
-
-<button id="back" onclick="goHome()">
-← Retour
-</button>
-
-<iframe
-    id="viewer"
-    src=""
-    allow="fullscreen; clipboard-read; clipboard-write">
-</iframe>
+  <button onclick="showRandomQuote()">Nouvelle citation</button>
+</main>
 
 <script>
+  const files = [
+    "Quotes/amour.txt",
+    "Quotes/foi.txt",
+    "Quotes/sagesse.txt"
+  ];
 
-function openQuotes(){
+  let quotes = [];
 
-    document.getElementById("home").style.display="none";
+  async function loadQuotes() {
+    for (const file of files) {
+      const response = await fetch(file);
+      const text = await response.text();
 
-    document.getElementById("back").style.display="block";
+      const lines = text
+        .split("\n")
+        .map(line => line.trim())
+        .filter(line => line.length > 0);
 
-    const iframe=document.getElementById("viewer");
+      quotes.push(...lines);
+    }
 
-    iframe.style.display="block";
+    showRandomQuote();
+  }
 
-    iframe.src="https://web.goodnotes.com/s/cEXFdD3ZPSoQNn4mZKQ49J";
+  function showRandomQuote() {
+    if (quotes.length === 0) {
+      document.getElementById("quote").textContent = "Aucune citation trouvée.";
+      return;
+    }
 
-}
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    document.getElementById("quote").textContent = quotes[randomIndex];
+  }
 
-function goHome(){
-
-    document.getElementById("viewer").src="";
-
-    document.getElementById("viewer").style.display="none";
-
-    document.getElementById("back").style.display="none";
-
-    document.getElementById("home").style.display="flex";
-
-}
-
+  loadQuotes();
 </script>
 
 </body>
