@@ -16,7 +16,7 @@
     }
 
     header {
-      background: linear-gradient(135deg, #111827, #1f2937);
+      background: #111827;
       color: white;
       padding: 42px 18px;
       text-align: center;
@@ -27,11 +27,6 @@
       font-size: 2.4rem;
     }
 
-    header p {
-      margin: 10px 0 0;
-      color: #d1d5db;
-    }
-
     main {
       width: min(1050px, 92%);
       margin: auto;
@@ -40,25 +35,17 @@
 
     .hidden { display: none; }
 
-    .toolbar {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-bottom: 22px;
-    }
-
     input, select {
       width: 100%;
       padding: 15px;
       border-radius: 12px;
       border: 1px solid #d1d5db;
       font-size: 1rem;
-      background: white;
+      margin-bottom: 15px;
     }
 
     .theme-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
     }
 
@@ -72,37 +59,21 @@
 
     .theme-card h2 {
       margin: 0 0 8px;
-      font-size: 1.45rem;
     }
 
     .theme-card p {
       margin: 0;
       color: #6b7280;
-      line-height: 1.5;
-    }
-
-    .back-button, .copy-button {
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      font-size: 1rem;
     }
 
     .back-button {
       background: #111827;
       color: white;
       padding: 13px 18px;
+      border: none;
+      border-radius: 12px;
       margin-bottom: 20px;
-    }
-
-    .page-title h2 {
-      font-size: 2rem;
-      margin: 0 0 6px;
-    }
-
-    .page-title p {
-      color: #6b7280;
-      margin: 0 0 20px;
+      font-size: 1rem;
     }
 
     .group {
@@ -120,10 +91,6 @@
       background: #111827;
       color: white;
       list-style: none;
-    }
-
-    .group summary::-webkit-details-marker {
-      display: none;
     }
 
     .group summary::before {
@@ -145,20 +112,13 @@
     .quote-text {
       font-size: 1.2rem;
       line-height: 1.6;
-      margin: 0 0 14px;
+      margin-bottom: 12px;
     }
 
     .quote-meta {
       color: #4b5563;
-      line-height: 1.5;
       font-size: 0.95rem;
-    }
-
-    .copy-button {
-      margin-top: 14px;
-      background: #2563eb;
-      color: white;
-      padding: 10px 14px;
+      line-height: 1.5;
     }
 
     .empty {
@@ -168,12 +128,6 @@
       text-align: center;
       color: #6b7280;
     }
-
-    footer {
-      text-align: center;
-      color: #6b7280;
-      padding: 25px;
-    }
   </style>
 </head>
 
@@ -181,84 +135,39 @@
 
 <header>
   <h1>Kodem Quotes</h1>
-  <p>Citations par thèmes, sources et références</p>
+  <p>Citations par thèmes</p>
 </header>
 
 <main>
 
   <section id="homePage">
-    <div class="toolbar">
-      <input id="themeSearch" type="search" placeholder="Rechercher un thème..." />
-    </div>
+    <input id="themeSearch" type="search" placeholder="Rechercher un thème..." />
     <div id="themeList" class="theme-grid"></div>
   </section>
 
   <section id="quotesPage" class="hidden">
     <button class="back-button" onclick="goBack()">← Retour aux thèmes</button>
 
-    <div class="page-title">
-      <h2 id="themeTitle"></h2>
-      <p id="quoteCount"></p>
-    </div>
+    <h2 id="themeTitle"></h2>
+    <p id="quoteCount"></p>
 
-    <div class="toolbar">
-      <input id="quoteSearch" type="search" placeholder="Rechercher dans les citations..." />
-      <select id="classifyBy">
-        <option value="all">Toutes les citations</option>
-        <option value="author">Classer par source / auteur</option>
-        <option value="reference">Classer par référence</option>
-      </select>
-    </div>
+    <input id="quoteSearch" type="search" placeholder="Rechercher dans les citations..." />
+
+    <select id="classifyBy">
+      <option value="all">Toutes les citations</option>
+      <option value="author">Classer par source / auteur</option>
+      <option value="reference">Classer par référence</option>
+    </select>
 
     <div id="quotesContainer"></div>
   </section>
 
 </main>
 
-<footer>Kodem Quotes — version iPad 1.0</footer>
-
 <script>
-  /*
-    FORMAT DES CITATIONS :
-    Citation
-    Citation | Source ou auteur
-    Citation | Source ou auteur | Référence
+  const THEMES_FILE = "Quotes/themes.json";
 
-    Pour ajouter un thème, ajoutez un bloc dans THEMES.
-  */
-
-  const THEMES = [
-    {
-      name: "Amour",
-      description: "Citations sur l’amour, la charité et la fraternité",
-      quotes: [
-        "L’amour supporte tout. | Paul | 1 Corinthiens 13",
-        "Aimez-vous les uns les autres. | Jésus | Jean 15:12",
-        "Là où il y a l’amour, il y a la vie. | Gandhi",
-        "L’amour ne périt jamais. | Paul | 1 Corinthiens 13:8"
-      ]
-    },
-    {
-      name: "Foi",
-      description: "Citations sur la confiance, l’espérance et la spiritualité",
-      quotes: [
-        "La foi voit l’invisible.",
-        "Tout est possible à celui qui croit. | Jésus | Marc 9:23",
-        "La foi est une ferme assurance des choses qu’on espère. | Auteur de l’épître aux Hébreux | Hébreux 11:1"
-      ]
-    },
-    {
-      name: "Sagesse",
-      description: "Citations de sagesse et de réflexion",
-      quotes: [
-        "Le commencement de la sagesse, c’est la crainte de l’Éternel. | Salomon | Proverbes 9:10",
-        "La patience est un arbre dont la racine est amère et les fruits très doux. | Proverbe",
-        "Connais-toi toi-même. | Socrate"
-      ]
-    }
-  ];
-
-  let currentTheme = null;
+  let themes = [];
   let currentQuotes = [];
 
   const homePage = document.getElementById("homePage");
@@ -271,47 +180,54 @@
   const quoteCount = document.getElementById("quoteCount");
   const quotesContainer = document.getElementById("quotesContainer");
 
-  function init() {
-    renderThemes(THEMES);
+  async function init() {
+    const response = await fetch(THEMES_FILE);
+    themes = await response.json();
+    renderThemes(themes);
   }
 
   function renderThemes(list) {
     themeList.innerHTML = "";
 
-    if (list.length === 0) {
-      themeList.innerHTML = `<div class="empty">Aucun thème trouvé.</div>`;
-      return;
-    }
-
     list.forEach(theme => {
       const card = document.createElement("div");
       card.className = "theme-card";
-      card.onclick = () => openTheme(theme);
+      card.onclick = () => loadTheme(theme);
+
       card.innerHTML = `
-        <h2>${escapeHtml(theme.name)}</h2>
-        <p>${escapeHtml(theme.description || "Voir les citations")}</p>
+        <h2>${theme.name}</h2>
+        <p>${theme.description || "Voir les citations"}</p>
       `;
+
       themeList.appendChild(card);
     });
   }
 
-  function openTheme(theme) {
-    currentTheme = theme;
-    currentQuotes = theme.quotes.map(parseQuoteLine);
-
+  async function loadTheme(theme) {
     themeTitle.textContent = theme.name;
-    quoteSearch.value = "";
-    classifyBy.value = "all";
+    quotesContainer.innerHTML = `<div class="empty">Chargement...</div>`;
+
+    const response = await fetch(theme.file);
+    const text = await response.text();
+
+    currentQuotes = text
+      .split("\n")
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .map(parseQuoteLine);
 
     homePage.classList.add("hidden");
     quotesPage.classList.remove("hidden");
+
+    quoteSearch.value = "";
+    classifyBy.value = "all";
 
     renderQuotes();
     window.scrollTo(0, 0);
   }
 
   function parseQuoteLine(line) {
-    const parts = line.split("|").map(part => part.trim());
+    const parts = line.split("|").map(p => p.trim());
 
     return {
       text: parts[0] || "",
@@ -325,8 +241,9 @@
     const mode = classifyBy.value;
 
     const filteredQuotes = currentQuotes.filter(q => {
-      const content = `${q.text} ${q.author} ${q.reference}`.toLowerCase();
-      return content.includes(search);
+      return `${q.text} ${q.author} ${q.reference}`
+        .toLowerCase()
+        .includes(search);
     });
 
     quoteCount.textContent = `${filteredQuotes.length} citation(s)`;
@@ -336,8 +253,9 @@
       return;
     }
 
+    quotesContainer.innerHTML = "";
+
     if (mode === "all") {
-      quotesContainer.innerHTML = "";
       quotesContainer.appendChild(createGroup("Toutes les citations", filteredQuotes, true));
       return;
     }
@@ -357,18 +275,15 @@
       groups[key].push(q);
     });
 
-    quotesContainer.innerHTML = "";
-
-    Object.keys(groups)
-      .sort((a, b) => a.localeCompare(b, "fr"))
-      .forEach(groupName => {
-        quotesContainer.appendChild(createGroup(groupName, groups[groupName], false));
-      });
+    Object.keys(groups).sort().forEach(groupName => {
+      quotesContainer.appendChild(createGroup(groupName, groups[groupName], false));
+    });
   }
 
   function createGroup(title, quotes, open = false) {
     const details = document.createElement("details");
     details.className = "group";
+
     if (open) details.open = true;
 
     const summary = document.createElement("summary");
@@ -379,19 +294,12 @@
       const card = document.createElement("article");
       card.className = "quote-card";
 
-      const fullQuote = [
-        q.text,
-        q.author ? `— ${q.author}` : "",
-        q.reference ? `(${q.reference})` : ""
-      ].filter(Boolean).join(" ");
-
       card.innerHTML = `
-        <p class="quote-text">“${escapeHtml(q.text)}”</p>
+        <div class="quote-text">“${q.text}”</div>
         <div class="quote-meta">
-          ${q.author ? `<div><strong>Source / Auteur :</strong> ${escapeHtml(q.author)}</div>` : ""}
-          ${q.reference ? `<div><strong>Référence :</strong> ${escapeHtml(q.reference)}</div>` : ""}
+          ${q.author ? `<div><strong>Source / Auteur :</strong> ${q.author}</div>` : ""}
+          ${q.reference ? `<div><strong>Référence :</strong> ${q.reference}</div>` : ""}
         </div>
-        <button class="copy-button" onclick="copyQuote('${escapeForAttribute(fullQuote)}')">Copier</button>
       `;
 
       details.appendChild(card);
@@ -403,37 +311,13 @@
   function goBack() {
     quotesPage.classList.add("hidden");
     homePage.classList.remove("hidden");
-    currentTheme = null;
-    currentQuotes = [];
     quotesContainer.innerHTML = "";
     window.scrollTo(0, 0);
   }
 
-  function copyQuote(text) {
-    navigator.clipboard.writeText(text).then(() => {
-      alert("Citation copiée.");
-    });
-  }
-
-  function escapeHtml(value) {
-    return String(value)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function escapeForAttribute(value) {
-    return String(value)
-      .replaceAll("\\", "\\\\")
-      .replaceAll("'", "\\'")
-      .replaceAll("\n", " ");
-  }
-
   themeSearch.addEventListener("input", () => {
-    const search = themeSearch.value.toLowerCase().trim();
-    const filtered = THEMES.filter(theme =>
+    const search = themeSearch.value.toLowerCase();
+    const filtered = themes.filter(theme =>
       `${theme.name} ${theme.description || ""}`.toLowerCase().includes(search)
     );
     renderThemes(filtered);
