@@ -1,53 +1,140 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kodem Quotes</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      text-align: center;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kodem Quotes</title>
 
-    header {
-      background: #111827;
-      color: white;
-      padding: 30px 16px;
-    }
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+        }
 
-    main {
-      padding: 50px 20px;
-    }
+        body{
+            font-family:Arial, Helvetica, sans-serif;
+            background:#f4f4f4;
+            overflow:hidden;
+        }
 
-    a.button {
-      display: inline-block;
-      background: #111827;
-      color: white;
-      padding: 18px 28px;
-      border-radius: 10px;
-      text-decoration: none;
-      font-size: 20px;
-      font-weight: bold;
-    }
-  </style>
+        #home{
+            position:fixed;
+            inset:0;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            align-items:center;
+            background:#111827;
+            color:white;
+            z-index:10;
+        }
+
+        h1{
+            font-size:3rem;
+            margin-bottom:25px;
+        }
+
+        p{
+            font-size:1.1rem;
+            margin-bottom:40px;
+            color:#d1d5db;
+        }
+
+        button{
+            padding:18px 45px;
+            font-size:20px;
+            border:none;
+            border-radius:12px;
+            background:#2563eb;
+            color:white;
+            cursor:pointer;
+            transition:.25s;
+        }
+
+        button:hover{
+            background:#1d4ed8;
+            transform:scale(1.05);
+        }
+
+        #viewer{
+            position:fixed;
+            inset:0;
+            width:100%;
+            height:100%;
+            border:none;
+            display:none;
+        }
+
+        #back{
+            position:fixed;
+            top:15px;
+            left:15px;
+            z-index:999;
+            display:none;
+            padding:10px 20px;
+            border:none;
+            border-radius:8px;
+            background:#111827;
+            color:white;
+            cursor:pointer;
+        }
+    </style>
 </head>
+
 <body>
-  <header>
+
+<div id="home">
+
     <h1>Kodem Quotes</h1>
-  </header>
 
-  <main>
-    <h2>Ouvrir les citations</h2>
-    <p>Cliquez sur le bouton ci-dessous pour consulter le contenu GoodNotes.</p>
+    <p>Consulter les citations en lecture seule.</p>
 
-    <a class="button"
-       href="https://web.goodnotes.com/s/cEXFdD3ZPSoQNn4mZKQ49J"
-       target="_blank">
-      Ouvrir GoodNotes
-    </a>
-  </main>
+    <button onclick="openQuotes()">
+        📖 Lire les Quotes
+    </button>
+
+</div>
+
+<button id="back" onclick="goHome()">
+← Retour
+</button>
+
+<iframe
+    id="viewer"
+    src=""
+    allow="fullscreen; clipboard-read; clipboard-write">
+</iframe>
+
+<script>
+
+function openQuotes(){
+
+    document.getElementById("home").style.display="none";
+
+    document.getElementById("back").style.display="block";
+
+    const iframe=document.getElementById("viewer");
+
+    iframe.style.display="block";
+
+    iframe.src="https://web.goodnotes.com/s/cEXFdD3ZPSoQNn4mZKQ49J";
+
+}
+
+function goHome(){
+
+    document.getElementById("viewer").src="";
+
+    document.getElementById("viewer").style.display="none";
+
+    document.getElementById("back").style.display="none";
+
+    document.getElementById("home").style.display="flex";
+
+}
+
+</script>
+
 </body>
 </html>
