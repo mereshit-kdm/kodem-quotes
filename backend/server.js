@@ -10,7 +10,7 @@ const {
   GITHUB_TOKEN,
   GITHUB_OWNER,
   GITHUB_REPO,
-  GITHUB_BRANCH,
+  GITHUB_BRANCH = "develop-v1",
   ADMIN_PASSWORD
 } = process.env;
 
@@ -68,7 +68,8 @@ app.post("/add-quote", async (req, res) => {
       return res.status(400).json({ error: "Thème et citation obligatoires" });
     }
 
-    const fileName = `${slugify(theme)}.txt`;
+    const themeName = theme.trim();
+    const fileName = `${slugify(themeName)}.txt`;
     const quotePath = `Quotes/${fileName}`;
     const themesPath = "Quotes/themes.json";
 
@@ -79,46 +80,46 @@ app.post("/add-quote", async (req, res) => {
     ].filter(Boolean).join(" | ");
 
     const quoteFile = await getFile(quotePath);
-    const newQuoteContent = quoteFile.content
-      ? `${quoteFile.content.trim()}\n${line}\n`
-      : `${line}\n`;
+    const existingContent = quoteFile.content ? quoteFile.content.trimEnd() : "";
+    const newQuoteContent = existingContent ? `${existingContent}\n${line}\n` : `${line}\n`;
 
-    await saveFile(
-      quotePath,
-      newQuoteContent,
-      `Ajout citation - ${theme}`,
-      quoteFile.sha
-    );
+    await saveFile(quotePath, newQuoteContent, `Ajout citation - ${themeName}`, quoteFile.sha);
 
     const themesFile = await getFile(themesPath);
     let themes = themesFile.content ? JSON.parse(themesFile.content) : [];
 
-    const exists = themes.some(t => t.file === quotePath);
+    const exists = themes.some(t => t.file === quotePath || slugify(t.name) === slugify(themeName));
 
     if (!exists) {
       themes.push({
-        name: theme.trim(),
+        name: themeName,
         file: quotePath,
-        description: `Citations sur ${theme.trim()}`
+        description: `Citations sur ${themeName}`
       });
+
+      themes.sort((a, b) => a.name.localeCompare(b.name, "fr"));
 
       await saveFile(
         themesPath,
-        JSON.stringify(themes, null, 2),
-        `Ajout thème - ${theme}`,
+        JSON.stringify(themes, null, 2) + "\n",
+        `Ajout thème - ${themeName}`,
         themesFile.sha
       );
     }
 
-    res.json({ ok: true, message: "Citation ajoutée avec succès" });
+    res.json({
+      ok: true,
+      message: "Citation ajoutée avec succès",
+      file: quotePath,
+      theme: themeName,
+      line
+    });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Erreur serveur" });
+    res.status(500).json({ error: "Erreur serveur", detail: error.message });
   }
 });
 
 const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`Backend lancé sur le port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`Backend lancé sur le port ${PORT}`));
