@@ -6,68 +6,173 @@
   <title>Kodem Quotes</title>
 
   <style>
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #111827;
-      color: white;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
     }
 
     header {
+      background: linear-gradient(135deg, #111827, #1f2937);
+      color: white;
+      padding: 42px 18px;
       text-align: center;
-      padding: 50px 20px;
     }
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 10px;
+    header h1 {
+      margin: 0;
+      font-size: 2.4rem;
+    }
+
+    header p {
+      margin: 10px 0 0;
+      color: #d1d5db;
     }
 
     main {
-      max-width: 900px;
+      width: min(1050px, 92%);
       margin: auto;
-      padding: 20px;
+      padding: 28px 0;
     }
 
-    .theme-list {
+    .hidden { display: none; }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      font-size: 1rem;
+      background: white;
+    }
+
+    .theme-grid {
       display: grid;
-      gap: 18px;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
     }
 
-    .theme {
+    .theme-card {
       background: white;
-      color: #111827;
       padding: 25px;
-      border-radius: 16px;
-      font-size: 1.5rem;
-      font-weight: bold;
+      border-radius: 18px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.08);
       cursor: pointer;
-      text-align: center;
     }
 
-    .quote {
-      background: white;
-      color: #111827;
-      margin-bottom: 20px;
-      padding: 25px;
-      border-radius: 16px;
-      font-size: 1.3rem;
-      line-height: 1.6;
+    .theme-card h2 {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
     }
 
-    button {
-      margin-bottom: 25px;
-      padding: 14px 24px;
+    .theme-card p {
+      margin: 0;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .back-button, .copy-button {
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .back-button {
+      background: #111827;
+      color: white;
+      padding: 13px 18px;
+      margin-bottom: 20px;
+    }
+
+    .page-title h2 {
+      font-size: 2rem;
+      margin: 0 0 6px;
+    }
+
+    .page-title p {
+      color: #6b7280;
+      margin: 0 0 20px;
+    }
+
+    .group {
+      background: white;
+      border-radius: 16px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.07);
+    }
+
+    .group summary {
+      cursor: pointer;
+      padding: 18px;
+      font-weight: bold;
+      background: #111827;
+      color: white;
+      list-style: none;
+    }
+
+    .group summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .group summary::before {
+      content: "▶ ";
+    }
+
+    .group[open] summary::before {
+      content: "▼ ";
+    }
+
+    .quote-card {
+      margin: 15px;
+      padding: 20px;
+      border-left: 6px solid #2563eb;
+      background: #f9fafb;
+      border-radius: 12px;
+    }
+
+    .quote-text {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      margin: 0 0 14px;
+    }
+
+    .quote-meta {
+      color: #4b5563;
+      line-height: 1.5;
+      font-size: 0.95rem;
+    }
+
+    .copy-button {
+      margin-top: 14px;
       background: #2563eb;
       color: white;
-      font-size: 18px;
-      cursor: pointer;
+      padding: 10px 14px;
     }
 
-    .hidden {
-      display: none;
+    .empty {
+      background: white;
+      padding: 24px;
+      border-radius: 14px;
+      text-align: center;
+      color: #6b7280;
+    }
+
+    footer {
+      text-align: center;
+      color: #6b7280;
+      padding: 25px;
     }
   </style>
 </head>
@@ -76,74 +181,268 @@
 
 <header>
   <h1>Kodem Quotes</h1>
-  <p>Choisissez un thème</p>
+  <p>Citations par thèmes, sources et références</p>
 </header>
 
 <main>
 
-  <section id="themes">
-    <div class="theme-list" id="themeList"></div>
+  <section id="homePage">
+    <div class="toolbar">
+      <input id="themeSearch" type="search" placeholder="Rechercher un thème..." />
+    </div>
+    <div id="themeList" class="theme-grid"></div>
   </section>
 
   <section id="quotesPage" class="hidden">
-    <button onclick="goBack()">← Retour aux thèmes</button>
-    <h2 id="themeTitle"></h2>
+    <button class="back-button" onclick="goBack()">← Retour aux thèmes</button>
+
+    <div class="page-title">
+      <h2 id="themeTitle"></h2>
+      <p id="quoteCount"></p>
+    </div>
+
+    <div class="toolbar">
+      <input id="quoteSearch" type="search" placeholder="Rechercher dans les citations..." />
+      <select id="classifyBy">
+        <option value="all">Toutes les citations</option>
+        <option value="author">Classer par source / auteur</option>
+        <option value="reference">Classer par référence</option>
+      </select>
+    </div>
+
     <div id="quotesContainer"></div>
   </section>
 
 </main>
 
+<footer>Kodem Quotes — version iPad 1.0</footer>
+
 <script>
-  const themes = [
-    { name: "Amour", file: "Quotes/amour.txt" },
-    { name: "Foi", file: "Quotes/foi.txt" },
-    { name: "Sagesse", file: "Quotes/sagesse.txt" }
+  /*
+    FORMAT DES CITATIONS :
+    Citation
+    Citation | Source ou auteur
+    Citation | Source ou auteur | Référence
+
+    Pour ajouter un thème, ajoutez un bloc dans THEMES.
+  */
+
+  const THEMES = [
+    {
+      name: "Amour",
+      description: "Citations sur l’amour, la charité et la fraternité",
+      quotes: [
+        "L’amour supporte tout. | Paul | 1 Corinthiens 13",
+        "Aimez-vous les uns les autres. | Jésus | Jean 15:12",
+        "Là où il y a l’amour, il y a la vie. | Gandhi",
+        "L’amour ne périt jamais. | Paul | 1 Corinthiens 13:8"
+      ]
+    },
+    {
+      name: "Foi",
+      description: "Citations sur la confiance, l’espérance et la spiritualité",
+      quotes: [
+        "La foi voit l’invisible.",
+        "Tout est possible à celui qui croit. | Jésus | Marc 9:23",
+        "La foi est une ferme assurance des choses qu’on espère. | Auteur de l’épître aux Hébreux | Hébreux 11:1"
+      ]
+    },
+    {
+      name: "Sagesse",
+      description: "Citations de sagesse et de réflexion",
+      quotes: [
+        "Le commencement de la sagesse, c’est la crainte de l’Éternel. | Salomon | Proverbes 9:10",
+        "La patience est un arbre dont la racine est amère et les fruits très doux. | Proverbe",
+        "Connais-toi toi-même. | Socrate"
+      ]
+    }
   ];
 
-  const themeList = document.getElementById("themeList");
-  const themesPage = document.getElementById("themes");
+  let currentTheme = null;
+  let currentQuotes = [];
+
+  const homePage = document.getElementById("homePage");
   const quotesPage = document.getElementById("quotesPage");
+  const themeList = document.getElementById("themeList");
+  const themeSearch = document.getElementById("themeSearch");
+  const quoteSearch = document.getElementById("quoteSearch");
+  const classifyBy = document.getElementById("classifyBy");
   const themeTitle = document.getElementById("themeTitle");
+  const quoteCount = document.getElementById("quoteCount");
   const quotesContainer = document.getElementById("quotesContainer");
 
-  themes.forEach(theme => {
-    const div = document.createElement("div");
-    div.className = "theme";
-    div.textContent = theme.name;
-    div.onclick = () => loadTheme(theme);
-    themeList.appendChild(div);
-  });
+  function init() {
+    renderThemes(THEMES);
+  }
 
-  async function loadTheme(theme) {
+  function renderThemes(list) {
+    themeList.innerHTML = "";
+
+    if (list.length === 0) {
+      themeList.innerHTML = `<div class="empty">Aucun thème trouvé.</div>`;
+      return;
+    }
+
+    list.forEach(theme => {
+      const card = document.createElement("div");
+      card.className = "theme-card";
+      card.onclick = () => openTheme(theme);
+      card.innerHTML = `
+        <h2>${escapeHtml(theme.name)}</h2>
+        <p>${escapeHtml(theme.description || "Voir les citations")}</p>
+      `;
+      themeList.appendChild(card);
+    });
+  }
+
+  function openTheme(theme) {
+    currentTheme = theme;
+    currentQuotes = theme.quotes.map(parseQuoteLine);
+
     themeTitle.textContent = theme.name;
-    quotesContainer.innerHTML = "Chargement...";
+    quoteSearch.value = "";
+    classifyBy.value = "all";
 
-    const response = await fetch(theme.file);
-    const text = await response.text();
+    homePage.classList.add("hidden");
+    quotesPage.classList.remove("hidden");
 
-    const quotes = text
-      .split("\n")
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
+    renderQuotes();
+    window.scrollTo(0, 0);
+  }
+
+  function parseQuoteLine(line) {
+    const parts = line.split("|").map(part => part.trim());
+
+    return {
+      text: parts[0] || "",
+      author: parts[1] || "",
+      reference: parts[2] || ""
+    };
+  }
+
+  function renderQuotes() {
+    const search = quoteSearch.value.toLowerCase().trim();
+    const mode = classifyBy.value;
+
+    const filteredQuotes = currentQuotes.filter(q => {
+      const content = `${q.text} ${q.author} ${q.reference}`.toLowerCase();
+      return content.includes(search);
+    });
+
+    quoteCount.textContent = `${filteredQuotes.length} citation(s)`;
+
+    if (filteredQuotes.length === 0) {
+      quotesContainer.innerHTML = `<div class="empty">Aucune citation trouvée.</div>`;
+      return;
+    }
+
+    if (mode === "all") {
+      quotesContainer.innerHTML = "";
+      quotesContainer.appendChild(createGroup("Toutes les citations", filteredQuotes, true));
+      return;
+    }
+
+    const groups = {};
+
+    filteredQuotes.forEach(q => {
+      let key = q[mode];
+
+      if (!key) {
+        key = mode === "author"
+          ? "Source / auteur non précisé"
+          : "Référence non précisée";
+      }
+
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(q);
+    });
 
     quotesContainer.innerHTML = "";
 
+    Object.keys(groups)
+      .sort((a, b) => a.localeCompare(b, "fr"))
+      .forEach(groupName => {
+        quotesContainer.appendChild(createGroup(groupName, groups[groupName], false));
+      });
+  }
+
+  function createGroup(title, quotes, open = false) {
+    const details = document.createElement("details");
+    details.className = "group";
+    if (open) details.open = true;
+
+    const summary = document.createElement("summary");
+    summary.textContent = `${title} (${quotes.length})`;
+    details.appendChild(summary);
+
     quotes.forEach(q => {
-      const div = document.createElement("div");
-      div.className = "quote";
-      div.textContent = q;
-      quotesContainer.appendChild(div);
+      const card = document.createElement("article");
+      card.className = "quote-card";
+
+      const fullQuote = [
+        q.text,
+        q.author ? `— ${q.author}` : "",
+        q.reference ? `(${q.reference})` : ""
+      ].filter(Boolean).join(" ");
+
+      card.innerHTML = `
+        <p class="quote-text">“${escapeHtml(q.text)}”</p>
+        <div class="quote-meta">
+          ${q.author ? `<div><strong>Source / Auteur :</strong> ${escapeHtml(q.author)}</div>` : ""}
+          ${q.reference ? `<div><strong>Référence :</strong> ${escapeHtml(q.reference)}</div>` : ""}
+        </div>
+        <button class="copy-button" onclick="copyQuote('${escapeForAttribute(fullQuote)}')">Copier</button>
+      `;
+
+      details.appendChild(card);
     });
 
-    themesPage.classList.add("hidden");
-    quotesPage.classList.remove("hidden");
+    return details;
   }
 
   function goBack() {
     quotesPage.classList.add("hidden");
-    themesPage.classList.remove("hidden");
+    homePage.classList.remove("hidden");
+    currentTheme = null;
+    currentQuotes = [];
     quotesContainer.innerHTML = "";
+    window.scrollTo(0, 0);
   }
+
+  function copyQuote(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      alert("Citation copiée.");
+    });
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function escapeForAttribute(value) {
+    return String(value)
+      .replaceAll("\\", "\\\\")
+      .replaceAll("'", "\\'")
+      .replaceAll("\n", " ");
+  }
+
+  themeSearch.addEventListener("input", () => {
+    const search = themeSearch.value.toLowerCase().trim();
+    const filtered = THEMES.filter(theme =>
+      `${theme.name} ${theme.description || ""}`.toLowerCase().includes(search)
+    );
+    renderThemes(filtered);
+  });
+
+  quoteSearch.addEventListener("input", renderQuotes);
+  classifyBy.addEventListener("change", renderQuotes);
+
+  init();
 </script>
 
 </body>

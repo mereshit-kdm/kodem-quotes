@@ -1,0 +1,17 @@
+[
+  {
+    "name": "Amour",
+    "file": "Quotes/amour.txt",
+    "description": "L'amour et la fraternité"
+  },
+  {
+    "name": "Foi",
+    "file": "Quotes/foi.txt",
+    "description": "La foi et l'espérance"
+  },
+  {
+    "name": "Sagesse",
+    "file": "Quotes/sagesse.txt",
+    "description": "Réflexions et sagesse"
+  }
+]
