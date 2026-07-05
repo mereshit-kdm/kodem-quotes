@@ -1,99 +1,149 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kodem Quotes</title>
+
   <style>
     body {
       margin: 0;
       font-family: Arial, sans-serif;
       background: #111827;
       color: white;
-      text-align: center;
     }
 
     header {
-      padding: 40px 20px;
+      text-align: center;
+      padding: 50px 20px;
     }
 
     h1 {
       font-size: 3rem;
+      margin-bottom: 10px;
     }
 
-    .quote-box {
+    main {
       max-width: 900px;
-      margin: 40px auto;
-      padding: 40px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .theme-list {
+      display: grid;
+      gap: 18px;
+    }
+
+    .theme {
       background: white;
       color: #111827;
-      border-radius: 18px;
-      font-size: 1.8rem;
-      line-height: 1.5;
+      padding: 25px;
+      border-radius: 16px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .quote {
+      background: white;
+      color: #111827;
+      margin-bottom: 20px;
+      padding: 25px;
+      border-radius: 16px;
+      font-size: 1.3rem;
+      line-height: 1.6;
     }
 
     button {
-      padding: 16px 30px;
-      font-size: 18px;
+      margin-bottom: 25px;
+      padding: 14px 24px;
       border: none;
       border-radius: 10px;
       background: #2563eb;
       color: white;
+      font-size: 18px;
       cursor: pointer;
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
+
 <body>
 
 <header>
   <h1>Kodem Quotes</h1>
-  <p>Citations inspirantes</p>
+  <p>Choisissez un thème</p>
 </header>
 
 <main>
-  <div class="quote-box" id="quote">
-    Chargement des citations...
-  </div>
 
-  <button onclick="showRandomQuote()">Nouvelle citation</button>
+  <section id="themes">
+    <div class="theme-list" id="themeList"></div>
+  </section>
+
+  <section id="quotesPage" class="hidden">
+    <button onclick="goBack()">← Retour aux thèmes</button>
+    <h2 id="themeTitle"></h2>
+    <div id="quotesContainer"></div>
+  </section>
+
 </main>
 
 <script>
-  const files = [
-    "Quotes/amour.txt",
-    "Quotes/foi.txt",
-    "Quotes/sagesse.txt"
+  const themes = [
+    { name: "Amour", file: "Quotes/amour.txt" },
+    { name: "Foi", file: "Quotes/foi.txt" },
+    { name: "Sagesse", file: "Quotes/sagesse.txt" }
   ];
 
-  let quotes = [];
+  const themeList = document.getElementById("themeList");
+  const themesPage = document.getElementById("themes");
+  const quotesPage = document.getElementById("quotesPage");
+  const themeTitle = document.getElementById("themeTitle");
+  const quotesContainer = document.getElementById("quotesContainer");
 
-  async function loadQuotes() {
-    for (const file of files) {
-      const response = await fetch(file);
-      const text = await response.text();
+  themes.forEach(theme => {
+    const div = document.createElement("div");
+    div.className = "theme";
+    div.textContent = theme.name;
+    div.onclick = () => loadTheme(theme);
+    themeList.appendChild(div);
+  });
 
-      const lines = text
-        .split("\n")
-        .map(line => line.trim())
-        .filter(line => line.length > 0);
+  async function loadTheme(theme) {
+    themeTitle.textContent = theme.name;
+    quotesContainer.innerHTML = "Chargement...";
 
-      quotes.push(...lines);
-    }
+    const response = await fetch(theme.file);
+    const text = await response.text();
 
-    showRandomQuote();
+    const quotes = text
+      .split("\n")
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+
+    quotesContainer.innerHTML = "";
+
+    quotes.forEach(q => {
+      const div = document.createElement("div");
+      div.className = "quote";
+      div.textContent = q;
+      quotesContainer.appendChild(div);
+    });
+
+    themesPage.classList.add("hidden");
+    quotesPage.classList.remove("hidden");
   }
 
-  function showRandomQuote() {
-    if (quotes.length === 0) {
-      document.getElementById("quote").textContent = "Aucune citation trouvée.";
-      return;
-    }
-
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    document.getElementById("quote").textContent = quotes[randomIndex];
+  function goBack() {
+    quotesPage.classList.add("hidden");
+    themesPage.classList.remove("hidden");
+    quotesContainer.innerHTML = "";
   }
-
-  loadQuotes();
 </script>
 
 </body>
